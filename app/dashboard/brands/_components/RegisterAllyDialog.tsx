@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
@@ -28,48 +29,71 @@ export function RegisterAllyDialog({ open, onClose }: RegisterAllyDialogProps) {
   });
 
   const registerAlly = useRegisterAlly();
+  const [requestId, setRequestId] = useState(crypto.randomUUID());
+
+  const handleClose = useCallback(() => {
+    form.reset();
+    setRequestId(crypto.randomUUID());
+    onClose();
+  }, [form, onClose]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && open) {
+        handleClose();
+      }
+    };
+    if (open) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, handleClose]);
 
   if (!open) return null;
 
   const onSubmit = (data: RegisterAllyFormData) => {
-    registerAlly.mutate(data, {
-      onSuccess: () => {
-        toast.success("¡Aliado Registrado!", {
-          description: `La empresa "${data.companyName}" ha sido vinculada exitosamente.`,
-        });
-        form.reset();
-        onClose();
+    registerAlly.mutate(
+      { ...data, requestId },
+      {
+        onSuccess: () => {
+          toast.success("¡Aliado Registrado!", {
+            description: `La empresa "${data.companyName}" ha sido vinculada exitosamente.`,
+          });
+          form.reset();
+          setRequestId(crypto.randomUUID());
+          onClose();
+        },
+        onError: (error) => {
+          if (error instanceof ApiError) {
+            error.messages.forEach((msg) => toast.error(msg));
+          } else {
+            toast.error(error.message || "Error al registrar el aliado");
+          }
+        },
       },
-      onError: (error) => {
-        if (error instanceof ApiError) {
-          error.messages.forEach((msg) => toast.error(msg));
-        } else {
-          toast.error(error.message || "Error al registrar el aliado");
-        }
-      },
-    });
-  };
-
-  const handleClose = () => {
-    form.reset();
-    onClose();
+    );
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 select-none">
-      
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 select-none"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ally-dialog-title"
+    >
       {/* Modal Dialog Card (rounded, shadow, max-w-lg) */}
       <div className="bg-white border border-slate-200 w-full max-w-lg rounded-2xl p-6 md:p-8 space-y-6 shadow-xl relative overflow-hidden animate-in zoom-in-95 duration-200">
-        
         {/* Top Accent Line (matching admin web color scheme) */}
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-slate-900"></div>
 
         {/* Header Block with X close button */}
         <div className="flex justify-between items-center pb-2">
           <div>
-            <h3 className="text-lg font-bold text-slate-800">Registrar Aliado Comercial</h3>
+            <h3 id="ally-dialog-title" className="text-lg font-bold text-slate-800">
+              Registrar Nuevo Aliado
+            </h3>
             <p className="text-xs text-slate-500 font-medium">
-              Agrega una nueva empresa socia a la red RecySmart.
+              Añade una nueva empresa aliada a la red RecySmart.
             </p>
           </div>
           <button
@@ -83,7 +107,6 @@ export function RegisterAllyDialog({ open, onClose }: RegisterAllyDialogProps) {
 
         {/* Form Container */}
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          
           {/* Renders dynamic child input elements */}
           <RegisterAllyForm form={form} isLoading={registerAlly.isPending} />
 
@@ -97,7 +120,7 @@ export function RegisterAllyDialog({ open, onClose }: RegisterAllyDialogProps) {
             >
               Cancelar
             </button>
-            
+
             <button
               type="submit"
               disabled={registerAlly.isPending}
@@ -106,11 +129,8 @@ export function RegisterAllyDialog({ open, onClose }: RegisterAllyDialogProps) {
               {registerAlly.isPending ? "Registrando..." : "Registrar Aliado"}
             </button>
           </div>
-
         </form>
-
       </div>
-
     </div>
   );
 }

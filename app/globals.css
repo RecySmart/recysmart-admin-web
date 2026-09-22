@@ -54,79 +54,78 @@
      Slate 900: #0f172a — primary dark text / dark backgrounds
      Slate 500: #64748b — secondary text / icons
      Slate 50 : #f8fafc — light backgrounds / inputs
-     Green 500: #22c55e — accents / success
+     Emerald 600: #059669 — primary action / brand
+     Emerald 500: #10b981 — accents
      Red 500  : #ef4444 — destructive / errors
   */
   --slate-900: #0f172a;
   --slate-500: #64748b;
   --slate-50: #f8fafc;
-  --green-500: #22c55e;
-  --green-500-rgb: 34 197 94;
+  --emerald-600: #059669;
+  --emerald-500: #10b981;
+  --emerald-500-rgb: 16 185 129;
   --red-500: #ef4444;
 
   /* Semantic tokens — Light mode */
   --background: var(--slate-50);
-  --card: var(--slate-50);
-  --popover: var(--slate-50);
-  --input: var(--slate-50);
+  --card: #ffffff;
+  --popover: #ffffff;
+  --input: #ffffff;
 
   --foreground: var(--slate-900);
   --card-foreground: var(--slate-900);
   --popover-foreground: var(--slate-900);
 
-  --primary: var(--slate-900);
-  /* Buttons, primary text */
-  --primary-foreground: var(--slate-50);
+  --primary: var(--emerald-600);
+  --primary-foreground: #ffffff;
 
-  --accent: var(--green-500);
-  --accent-foreground: var(--slate-50);
-  --ring: var(--green-500-rgb);
+  --accent: var(--emerald-500);
+  --accent-foreground: #ffffff;
+  --ring: var(--emerald-500-rgb);
 
   --destructive: var(--red-500);
-  --destructive-foreground: var(--slate-50);
+  --destructive-foreground: #ffffff;
 
   --muted-foreground: var(--slate-500);
   --secondary-foreground: var(--slate-500);
 
   --border: rgba(100, 116, 139, 0.25);
-  /* subtle slate-500 border */
   --muted: var(--slate-50);
   --secondary: var(--slate-500);
 
   /* Sidebar Light */
-  --sidebar: var(--slate-50);
+  --sidebar: #ffffff;
   --sidebar-foreground: var(--slate-900);
-  --sidebar-primary: var(--slate-900);
-  --sidebar-primary-foreground: var(--slate-50);
-  --sidebar-accent: var(--green-500);
-  --sidebar-accent-foreground: var(--slate-50);
+  --sidebar-primary: var(--emerald-600);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--slate-50);
+  --sidebar-accent-foreground: var(--slate-900);
   --sidebar-border: rgba(100, 116, 139, 0.16);
-  --sidebar-ring: var(--green-500);
+  --sidebar-ring: var(--emerald-600);
 
-  --radius: 0.625rem;
+  --radius: 0.5rem;
 }
 
 .dark {
-  /* Dark mode — keep same palette variables but swap semantic tokens */
+  /* Dark mode */
   --background: var(--slate-900);
-  --card: var(--slate-900);
-  --popover: var(--slate-900);
-  --input: var(--slate-900);
+  --card: #020617; /* Slate 950 */
+  --popover: #020617;
+  --input: #020617;
 
   --foreground: var(--slate-50);
   --card-foreground: var(--slate-50);
   --popover-foreground: var(--slate-50);
 
-  /* Make primary in dark mode a visible accent (green) for buttons */
-  --primary: var(--green-500);
-  --primary-foreground: var(--slate-900);
+  --primary: var(--emerald-500);
+  --primary-foreground: #ffffff;
 
-  --accent: var(--green-500);
-  --accent-foreground: var(--slate-900);
-  --ring: var(--green-500-rgb);
+  --accent: var(--emerald-500);
+  --accent-foreground: #ffffff;
+  --ring: var(--emerald-500-rgb);
 
   --destructive: var(--red-500);
-  --destructive-foreground: var(--slate-50);
+  --destructive-foreground: #ffffff;
 
   --muted-foreground: var(--slate-500);
   --secondary-foreground: var(--slate-500);
@@ -135,14 +134,14 @@
   --muted: var(--slate-900);
   --secondary: var(--slate-500);
 
-  --sidebar: var(--slate-900);
+  --sidebar: #020617;
   --sidebar-foreground: var(--slate-50);
-  --sidebar-primary: var(--green-500);
-  --sidebar-primary-foreground: var(--slate-900);
-  --sidebar-accent: var(--green-500);
+  --sidebar-primary: var(--emerald-500);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--slate-900);
   --sidebar-accent-foreground: var(--slate-50);
   --sidebar-border: rgba(100, 116, 139, 0.16);
-  --sidebar-ring: var(--green-500);
+  --sidebar-ring: var(--emerald-500);
 }
 
 @layer base {

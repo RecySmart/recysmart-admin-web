@@ -26,12 +26,12 @@ export function NavItem({ item, collapsed, onClick }: NavItemProps) {
       href={item.href}
       title={collapsed ? item.name : undefined}
       onClick={onClick}
-      className={`flex items-center rounded-xl font-medium transition-all duration-200 ${
-        collapsed ? "justify-center p-3" : "px-4 py-3"
+      className={`flex items-center rounded-lg font-medium transition-colors text-sm ${
+        collapsed ? "justify-center p-3" : "px-3 py-2"
       } ${
         isActive
-          ? "bg-green-500/10 text-green-400 font-semibold shadow-inner"
-          : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+          ? "bg-emerald-50 text-emerald-700"
+          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
       }`}
     >
       <Icon className={`w-5 h-5 shrink-0 transition-all ${collapsed ? "mr-0" : "mr-3"}`} />

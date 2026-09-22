@@ -24,15 +24,14 @@ export async function apiFetch<T>(
     let json;
     try {
         json = await res.json();
-    } catch (err) {
+    } catch {
         throw new ApiError(["Error de conexión con el servidor"]);
     }
 
     if (!res.ok) {
         if (res.status === 401) {
             if (typeof window !== "undefined") {
-                const { signOut } = require("next-auth/react");
-                signOut({ callbackUrl: "/login" });
+                window.location.href = "/api/auth/signout?callbackUrl=/login";
             }
         }
         const error = ErrorResponseSchema.safeParse(json);

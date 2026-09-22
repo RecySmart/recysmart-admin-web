@@ -1,49 +1,55 @@
 "use client";
 
-import { useState } from "react";
 import { Citizen } from "@/src/schemas";
 import {
+  Ban,
   Coins,
   Crown,
+  Globe,
+  Leaf,
+  Loader2,
   Sprout,
   Trees,
-  FileText,
-  Ban,
-  Unlock, ChevronLeft,
+  Unlock,
+  ChevronLeft,
   ChevronRight,
-  Globe,
-  Leaf
 } from "lucide-react";
 
 interface CitizensTableProps {
   citizens: Citizen[];
   isLoading?: boolean;
   total?: number;
+  page?: number;
+  limit?: number;
+  updatingCitizenId?: string;
+  onToggleStatus: (citizen: Citizen) => void;
+  onNextPage?: () => void;
+  onPrevPage?: () => void;
 }
-
 export function CitizenRowSkeleton() {
   return (
     <tr className="animate-pulse">
-      <td className="px-6 py-4 flex items-center gap-4">
-        <div className="w-10 h-10 bg-slate-200 rounded-full shrink-0"></div>
-        <div className="space-y-2">
-          <div className="h-4 bg-slate-200 rounded w-24"></div>
-          <div className="h-3 bg-slate-100 rounded w-32"></div>
-          <div className="h-2.5 bg-slate-100 rounded w-20"></div>
+      <td className="px-6 py-4">
+        <div className="flex items-center gap-4">
+          <div className="h-10 w-10 shrink-0 rounded-full bg-slate-200" />
+          <div className="space-y-2">
+            <div className="h-4 w-24 rounded bg-slate-200" />
+            <div className="h-3 w-32 rounded bg-slate-100" />
+          </div>
         </div>
       </td>
       <td className="px-6 py-4">
-        <div className="h-4 bg-slate-200 rounded w-16 mb-2"></div>
-        <div className="h-3 bg-slate-100 rounded w-20"></div>
+        <div className="mb-2 h-4 w-16 rounded bg-slate-200" />
+        <div className="h-3 w-20 rounded bg-slate-100" />
       </td>
       <td className="px-6 py-4">
-        <div className="h-6 bg-slate-200 rounded w-24"></div>
+        <div className="h-6 w-24 rounded bg-slate-200" />
       </td>
       <td className="px-6 py-4">
-        <div className="h-6 bg-slate-200 rounded-full w-16"></div>
+        <div className="h-6 w-16 rounded-full bg-slate-200" />
       </td>
       <td className="px-6 py-4 text-right">
-        <div className="h-6 bg-slate-200 rounded w-12 ml-auto"></div>
+        <div className="ml-auto h-8 w-8 rounded bg-slate-200" />
       </td>
     </tr>
   );
@@ -53,74 +59,71 @@ export function CitizensTable({
   citizens,
   isLoading = false,
   total,
+  page = 1,
+  limit = 10,
+  updatingCitizenId,
+  onToggleStatus,
+  onNextPage,
+  onPrevPage,
 }: CitizensTableProps) {
-  // Local state to simulate status toggle (active vs suspended) without persisting to DB
-  const [localStatuses, setLocalStatuses] = useState<Record<string, boolean>>({});
-
-  const getCitizenStatus = (citizen: Citizen) => {
-    return localStatuses[citizen.id] !== undefined
-      ? localStatuses[citizen.id]
-      : citizen.isActive;
-  };
-
-  const handleToggleStatus = (citizenId: string, currentStatus: boolean) => {
-    setLocalStatuses((prev) => ({
-      ...prev,
-      [citizenId]: !currentStatus,
-    }));
-  };
-
   const getLevelStyling = (levelTitle: string = "Eco Beginner") => {
     const title = levelTitle.toLowerCase();
+
     if (title.includes("guardian")) {
       return {
-        bg: "bg-blue-50 text-blue-700 border border-blue-200",
+        className: "border-blue-200 bg-blue-50 text-blue-700",
         icon: Globe,
       };
     }
     if (title.includes("master")) {
       return {
-        bg: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+        className: "border-yellow-200 bg-yellow-50 text-yellow-700",
         icon: Crown,
       };
     }
     if (title.includes("warrior")) {
       return {
-        bg: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+        className: "border-emerald-200 bg-emerald-50 text-emerald-700",
         icon: Trees,
       };
     }
     if (title.includes("apprentice")) {
       return {
-        bg: "bg-amber-50 text-amber-600 border border-amber-200",
+        className: "border-amber-200 bg-amber-50 text-amber-700",
         icon: Leaf,
       };
     }
+
     return {
-      bg: "bg-slate-100 text-slate-600 border border-slate-200",
+      className: "border-slate-200 bg-slate-100 text-slate-600",
       icon: Sprout,
     };
   };
 
+  const startRecord = (page - 1) * limit + (citizens.length > 0 ? 1 : 0);
+  const endRecord = (page - 1) * limit + citizens.length;
+  const totalRecords = total ?? citizens.length;
+  const hasNextPage = totalRecords > page * limit;
+  const hasPrevPage = page > 1;
+
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden flex flex-col">
-      {/* Table Title and Metadata */}
-      <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-white">
-        <h3 className="text-sm font-bold text-slate-800">
-          Registered Users (<span className="text-blue-600">{total ?? citizens.length}</span>)
-        </h3>
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-sm">
+      <div className="border-b border-slate-100 p-5">
+        <h2 className="text-sm font-bold text-slate-800">
+          Usuarios registrados (
+          <span className="text-blue-600">{totalRecords}</span>)
+        </h2>
       </div>
 
-      {/* Table Content */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-200">
+        <table className="w-full min-w-200 border-collapse text-left">
           <thead>
-            <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 text-xs uppercase tracking-widest font-bold">
-              <th className="px-6 py-4">Citizen Profile</th>
-              <th className="px-6 py-4">Wallet Balance</th>
-              <th className="px-6 py-4">Gamification Level</th>
-              <th className="px-6 py-4">Account Status</th>
-              <th className="px-6 py-4 text-right">Actions</th>
+            <tr className="border-b border-slate-200 bg-slate-50 text-xs font-bold uppercase tracking-widest text-slate-500">
+              <th className="px-6 py-4">Ciudadano</th>
+              <th className="px-6 py-4">EcoPuntos</th>
+              <th className="px-6 py-4">Nivel</th>
+              <th className="px-6 py-4">Estado</th>
+              <th className="px-6 py-4 text-right">Acción</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-sm">
@@ -132,90 +135,115 @@ export function CitizensTable({
               </>
             ) : citizens.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-slate-400">
-                  No citizen accounts found matching your search.
+                <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                  No se encontraron ciudadanos.
                 </td>
               </tr>
             ) : (
               citizens.map((citizen) => {
-                const isActive = getCitizenStatus(citizen);
-                const levelStyling = getLevelStyling(citizen.wallet?.levelTitle);
+                const levelStyling = getLevelStyling(
+                  citizen.wallet?.levelTitle,
+                );
                 const LevelIcon = levelStyling.icon;
+                const isUpdating = updatingCitizenId === citizen.id;
 
                 return (
                   <tr
                     key={citizen.id}
-                    className={`hover:bg-slate-50/50 transition-colors group ${
-                      !isActive ? "bg-red-50/10" : ""
-                    }`}
+                    className={
+                      citizen.isActive
+                        ? "transition-colors hover:bg-slate-50/70"
+                        : "bg-red-50/30 transition-colors hover:bg-red-50/50"
+                    }
                   >
-                    <td className="px-6 py-4 flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
-                        {citizen.name.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2)}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors truncate">
-                          {citizen.name}
-                        </p>
-                        <p className="text-xs text-slate-500 truncate">
-                          {citizen.email}
-                        </p>
-                        <p className="text-[10px] text-slate-400 font-mono mt-0.5">
-                          ID: {citizen.id}
-                        </p>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-blue-100 bg-blue-50 font-bold text-blue-700">
+                          {citizen.name
+                            .split(" ")
+                            .map((name) => name[0])
+                            .join("")
+                            .toUpperCase()
+                            .substring(0, 2)}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate font-bold text-slate-800">
+                            {citizen.name}
+                          </p>
+                          <p className="truncate text-xs text-slate-500">
+                            {citizen.email}
+                          </p>
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <Coins className="text-green-500 w-4 h-4" />
+                        <Coins
+                          aria-hidden="true"
+                          className="h-4 w-4 text-green-600"
+                        />
                         <span className="font-bold text-slate-700">
-                          {citizen.wallet?.currentBalance.toLocaleString() ?? "0"}
+                          {citizen.wallet?.currentBalance.toLocaleString() ??
+                            "0"}
                         </span>
                       </div>
-                      <p className="text-[10px] text-slate-400 mt-1 uppercase font-semibold">
-                        Lifetime: {citizen.wallet?.lifetimePoints.toLocaleString() ?? "0"}
+                      <p className="mt-1 text-xs text-slate-500">
+                        Acumulados:{" "}
+                        {citizen.wallet?.lifetimePoints.toLocaleString() ?? "0"}
                       </p>
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold ${levelStyling.bg}`}
+                        className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-bold ${levelStyling.className}`}
                       >
-                        <LevelIcon className="w-3 h-3" /> {citizen.wallet?.levelTitle ?? "Eco Beginner"}
+                        <LevelIcon aria-hidden="true" className="h-3 w-3" />
+                        {citizen.wallet?.levelTitle ?? "Eco Beginner"}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
-                          isActive
-                            ? "bg-green-50 text-green-600 border-green-200"
-                            : "bg-red-50 text-red-600 border-red-200"
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold ${
+                          citizen.isActive
+                            ? "border-green-200 bg-green-50 text-green-700"
+                            : "border-red-200 bg-red-50 text-red-700"
                         }`}
                       >
                         <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            isActive ? "bg-green-500" : "bg-red-500"
+                          aria-hidden="true"
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            citizen.isActive ? "bg-green-500" : "bg-red-500"
                           }`}
-                        ></span>
-                        {isActive ? "Active" : "Suspended"}
+                        />
+                        {citizen.isActive ? "Activo" : "Suspendido"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right whitespace-nowrap">
+                    <td className="px-6 py-4 text-right">
                       <button
-                        className="text-slate-400 hover:text-slate-900 p-1.5 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer inline-block"
-                        title="View Audit Logs"
-                      >
-                        <FileText className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleToggleStatus(citizen.id, isActive)}
-                        className={`p-1.5 rounded-lg transition-colors cursor-pointer inline-block ml-2 ${
-                          isActive
-                            ? "text-slate-400 hover:text-red-600 hover:bg-red-50"
-                            : "text-slate-400 hover:text-green-600 hover:bg-green-50"
+                        type="button"
+                        onClick={() => onToggleStatus(citizen)}
+                        disabled={isUpdating}
+                        aria-label={
+                          citizen.isActive
+                            ? `Suspender a ${citizen.name}`
+                            : `Reactivar a ${citizen.name}`
+                        }
+                        className={`inline-flex h-10 w-10 items-center justify-center rounded-lg transition-colors disabled:cursor-wait disabled:opacity-50 ${
+                          citizen.isActive
+                            ? "text-slate-500 hover:bg-red-50 hover:text-red-700"
+                            : "text-slate-500 hover:bg-green-50 hover:text-green-700"
                         }`}
-                        title={isActive ? "Suspend Wallet" : "Restore Wallet"}
+                        title={citizen.isActive ? "Suspender" : "Reactivar"}
                       >
-                        {isActive ? <Ban className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                        {isUpdating ? (
+                          <Loader2
+                            aria-hidden="true"
+                            className="h-4 w-4 animate-spin"
+                          />
+                        ) : citizen.isActive ? (
+                          <Ban aria-hidden="true" className="h-4 w-4" />
+                        ) : (
+                          <Unlock aria-hidden="true" className="h-4 w-4" />
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -226,31 +254,29 @@ export function CitizensTable({
         </table>
       </div>
 
-      {/* Pagination Footer */}
       {!isLoading && (
-        <div className="p-4 border-t border-slate-100 flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-50 text-sm text-slate-500">
-          <p>
-            Showing <span className="font-bold text-slate-800">1</span> to{" "}
-            <span className="font-bold text-slate-800">
-              {citizens.length}
-            </span>{" "}
-            of <span className="font-bold text-slate-800">{total ?? citizens.length}</span> citizens
-          </p>
-          <div className="flex gap-2">
+        <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50 p-4 text-sm text-slate-600">
+          <div>
+            Mostrando <strong className="text-slate-800">{startRecord}</strong>{" "}
+            a <strong className="text-slate-800">{endRecord}</strong> de{" "}
+            <strong className="text-slate-800">{totalRecords}</strong> ciudadanos.
+          </div>
+          <div className="flex items-center gap-2">
             <button
-              className="p-1.5 border border-slate-200 rounded-lg bg-white hover:bg-slate-100 transition-colors disabled:opacity-50 flex items-center justify-center cursor-pointer"
-              disabled
+              onClick={onPrevPage}
+              disabled={!hasPrevPage}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50"
+              aria-label="Página anterior"
             >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button className="px-3 py-1 border border-slate-200 rounded-lg bg-white hover:bg-slate-100 transition-colors text-blue-600 font-bold cursor-pointer">
-              1
+              <ChevronLeft className="h-4 w-4" />
             </button>
             <button
-              className="p-1.5 border border-slate-200 rounded-lg bg-white hover:bg-slate-100 transition-colors disabled:opacity-50 flex items-center justify-center cursor-pointer"
-              disabled
+              onClick={onNextPage}
+              disabled={!hasNextPage}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50"
+              aria-label="Página siguiente"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>

@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", inter.variable)}>
+    <html lang="es" className={cn("font-sans", inter.variable)}>
       <body className={`${inter.variable} antialiased`}>
         <AuthProvider>
           <QueryProvider>{children}</QueryProvider>

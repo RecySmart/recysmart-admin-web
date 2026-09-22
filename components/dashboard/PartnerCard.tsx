@@ -1,161 +1,98 @@
-"use client";
-
-import Link from "next/link";
 import { Partner } from "@/src/schemas";
 import { Store } from "lucide-react";
 
 interface PartnerCardProps {
   partner: Partner;
-  isActive: boolean;
-  onToggleStatus: () => void;
 }
-
 export function PartnerCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xs animate-pulse overflow-hidden flex flex-col h-full">
-      <div className="p-6 border-b border-slate-100 flex gap-4 items-start">
-        <div className="w-16 h-16 bg-slate-200 rounded-xl shrink-0"></div>
-        <div className="space-y-2 flex-1">
-          <div className="h-4 bg-slate-200 rounded w-32"></div>
-          <div className="h-3 bg-slate-100 rounded w-24"></div>
-          <div className="h-5 bg-slate-100 rounded w-20 mt-2"></div>
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
+      <div className="flex animate-pulse items-start gap-4 border-b border-slate-100 p-6">
+        <div className="h-16 w-16 shrink-0 rounded-xl bg-slate-200" />
+        <div className="flex-1 space-y-2">
+          <div className="h-4 w-32 rounded bg-slate-200" />
+          <div className="h-3 w-24 rounded bg-slate-100" />
+          <div className="mt-2 h-5 w-20 rounded bg-slate-100" />
         </div>
       </div>
-      <div className="p-5 flex-1 bg-slate-50/50 space-y-3">
-        <div className="h-5 bg-slate-200 rounded w-full"></div>
-        <div className="h-5 bg-slate-200 rounded w-full"></div>
-        <div className="h-5 bg-slate-200 rounded w-full"></div>
-      </div>
-      <div className="p-4 border-t border-slate-100 bg-white flex gap-2">
-        <div className="h-9 bg-slate-200 rounded flex-1"></div>
-        <div className="h-9 bg-slate-200 rounded w-10"></div>
+      <div className="flex-1 space-y-3 bg-slate-50/50 p-5">
+        <div className="h-5 w-full rounded bg-slate-200" />
+        <div className="h-5 w-full rounded bg-slate-200" />
+        <div className="h-5 w-full rounded bg-slate-200" />
       </div>
     </div>
   );
 }
 
-export function PartnerCard({
-  partner,
-  isActive,
-  onToggleStatus,
-}: PartnerCardProps) {
-  // Format points reclaimed (e.g. 45200 -> "45.2k")
-  const formatPoints = (pts: number) => {
-    if (pts >= 1000) {
-      return `${(pts / 1000).toFixed(1)}k`;
-    }
-    return pts.toString();
-  };
-
-  // Derive a mockup category name based on partner RUC/ID to make the UI feel alive
-  const getCategory = (companyName: string) => {
-    const name = companyName.toLowerCase();
-    if (name.includes("mart") || name.includes("super") || name.includes("retail")) {
-      return "Retail";
-    }
-    if (name.includes("cafe") || name.includes("starbucks") || name.includes("food") || name.includes("restaurant")) {
-      return "Food & Beverage";
-    }
-    return "Entertainment & Services";
-  };
-
-  const category = getCategory(partner.companyName);
-
+export function PartnerCard({ partner }: PartnerCardProps) {
   return (
-    <div
-      className={`bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col ${
-        !isActive ? "opacity-75 grayscale hover:grayscale-0" : ""
+    <article
+      className={`flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs ${
+        partner.isActive ? "" : "opacity-80"
       }`}
     >
-      {/* Brand card header */}
-      <div className="p-6 border-b border-slate-100 flex gap-4 items-start relative">
-        <div className="absolute top-4 right-4">
-          <span
-            className={`w-2.5 h-2.5 rounded-full inline-block ${
-              isActive
-                ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"
-                : "bg-red-500"
-            }`}
-          ></span>
-        </div>
-        
-        {/* General Store Icon for Partner Brand Logo */}
+      <div className="flex items-start gap-4 border-b border-slate-100 p-6">
         <div
-          className={`w-16 h-16 rounded-xl flex items-center justify-center text-2xl border shrink-0 ${
-            isActive
-              ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-              : "bg-slate-100 text-slate-400 border-slate-200"
+          className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border ${
+            partner.isActive
+              ? "border-emerald-100 bg-emerald-50 text-emerald-700"
+              : "border-slate-200 bg-slate-100 text-slate-500"
           }`}
         >
-          <Store className="w-8 h-8" />
+          <Store aria-hidden="true" className="h-8 w-8" />
         </div>
-        
-        <div className="min-w-0">
-          <h3 className="font-bold text-slate-800 text-lg leading-tight truncate">
+
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-lg font-bold leading-tight text-slate-800">
             {partner.companyName}
-          </h3>
-          <p className="text-xs text-slate-500 font-mono mt-1">
+          </h2>
+          <p className="mt-1 font-mono text-xs text-slate-500">
             RUC: {partner.ruc}
           </p>
-          <p
-            className={`text-[10px] font-bold uppercase mt-2.5 inline-block px-2 py-0.5 rounded border ${
-              isActive
-                ? "bg-slate-100 text-slate-500 border-slate-200"
-                : "bg-red-50 text-red-500 border-red-100"
+          <span
+            className={`mt-2.5 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold ${
+              partner.isActive
+                ? "border-green-200 bg-green-50 text-green-700"
+                : "border-red-200 bg-red-50 text-red-700"
             }`}
           >
-            {isActive ? category : "Suspended"}
-          </p>
+            <span
+              aria-hidden="true"
+              className={`h-1.5 w-1.5 rounded-full ${
+                partner.isActive ? "bg-green-500" : "bg-red-500"
+              }`}
+            />
+            {partner.isActive ? "Activo" : "Suspendido"}
+          </span>
         </div>
       </div>
 
-      {/* Brand metrics content */}
-      <div className="p-5 flex-1 bg-slate-50/50 flex flex-col justify-center">
-        <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-3">
-          <span className="text-xs text-slate-500 font-semibold">Active Rewards</span>
-          <span className="text-sm font-bold text-slate-800 bg-white px-2 py-1 rounded border border-slate-200">
-            {partner.activeRewardsCount}
-          </span>
+      <dl className="flex flex-1 flex-col justify-center bg-slate-50/50 p-5">
+        <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3">
+          <dt className="text-xs font-semibold text-slate-500">
+            Recompensas activas
+          </dt>
+          <dd className="rounded border border-slate-200 bg-white px-2 py-1 text-sm font-bold tabular-nums text-slate-800">
+            {partner.activeRewardsCount.toLocaleString()}
+          </dd>
         </div>
-        <div className="flex justify-between items-center mb-3 border-b border-slate-100 pb-3">
-          <span className="text-xs text-slate-500 font-semibold">Total Coupons Redeemed</span>
-          <span className="text-sm font-bold text-green-600">
+        <div className="flex items-center justify-between gap-4 border-b border-slate-100 py-3">
+          <dt className="text-xs font-semibold text-slate-500">
+            Cupones canjeados
+          </dt>
+          <dd className="text-sm font-bold tabular-nums text-green-700">
             {partner.totalCouponsRedeemed.toLocaleString()}
-          </span>
+          </dd>
         </div>
-        <div className="flex justify-between items-center">
-          <span className="text-xs text-slate-500 font-semibold">Points Reclaimed</span>
-          <span className="text-sm font-bold text-slate-800">
-            {formatPoints(partner.pointsReclaimed)}{" "}
-            <span className="text-[10px] text-slate-400">pts</span>
-          </span>
+        <div className="flex items-center justify-between gap-4 pt-3">
+          <dt className="text-xs font-semibold text-slate-500">
+            EcoPuntos recuperados
+          </dt>
+          <dd className="text-sm font-bold tabular-nums text-slate-800">
+            {partner.pointsReclaimed.toLocaleString()}
+          </dd>
         </div>
-      </div>
-
-      {/* Brand card action footer */}
-      <div className="p-4 border-t border-slate-100 bg-white flex justify-between gap-2">
-        <Link
-          href={`/dashboard/brands/${partner.id}/catalog`}
-          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all border text-center flex items-center justify-center cursor-pointer ${
-            isActive
-              ? "text-blue-600 hover:bg-blue-50 border-transparent"
-              : "text-slate-400 bg-slate-50 border-slate-200 cursor-not-allowed pointer-events-none"
-          }`}
-        >
-          View Catalog
-        </Link>
-        <button
-          onClick={onToggleStatus}
-          className={`px-3 py-2 text-xs font-bold rounded-lg transition-all border cursor-pointer shrink-0 ${
-            isActive
-              ? "text-slate-500 border-slate-200 hover:text-red-600 hover:bg-red-50 hover:border-red-100"
-              : "bg-slate-900 border-transparent hover:bg-slate-800 text-white"
-          }`}
-          title={isActive ? "Suspend Access" : "Restore Access"}
-        >
-          {isActive ? "Suspend" : "Restore"}
-        </button>
-      </div>
-    </div>
+      </dl>
+    </article>
   );
 }

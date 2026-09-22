@@ -1,5 +1,5 @@
 import { DefaultSession, DefaultUser } from "next-auth";
-import { JWT } from "next-auth/jwt";
+
 
 export type AppRole = "ADMIN" | "RECYCLER" | "ALLY";
 

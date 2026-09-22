@@ -54,7 +54,7 @@ export function BadgeCard({
         </p>
         <div className="flex items-center gap-2 text-xs font-mono text-slate-700 bg-slate-200/50 px-2.5 py-1.5 rounded-lg border border-slate-200/30">
           <Satellite className="w-3.5 h-3.5 text-purple-500 shrink-0" />
-          <span>@Event('{eventTrigger}')</span>
+          <span>@Event(&apos;{eventTrigger}&apos;)</span>
         </div>
         <div className="mt-2 text-xs font-mono text-slate-600 bg-slate-900/5 p-2 rounded-lg border border-black/5">
           <span className="text-pink-600 font-semibold">if</span> {ruleCode}
