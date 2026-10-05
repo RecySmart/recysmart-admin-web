@@ -119,9 +119,16 @@ export function RegisterAllyForm({ form, isLoading }: RegisterAllyFormProps) {
           <input
             id="ruc"
             type="text"
+            inputMode="numeric"
+            maxLength={11}
+            pattern="[0-9]{11}"
             disabled={isLoading}
             placeholder="20123456789"
-            {...register("ruc")}
+            {...register("ruc", {
+              onChange: (event) => {
+                event.target.value = event.target.value.replace(/\D/g, "").slice(0, 11);
+              },
+            })}
             className={`w-full h-10 px-3 border rounded-lg bg-white text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all ${
               errors.ruc ? "border-red-500" : "border-slate-200"
             }`}
